@@ -1,49 +1,47 @@
 'use client';
 
 import { Box, Input, Button, Textarea } from '@chakra-ui/react';
-import { FormControl, FormLabel } from '@chakra-ui/form-control';
-import { useState } from 'react';
+import {
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+} from '@chakra-ui/form-control';
 import { useRouter } from 'next/navigation';
 import { projectService } from '@/services/projectService';
 import { ROUTES } from '@/config/routes';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { projectSchema } from '@/validations/validationSchemas';
 
 export default function AddProject() {
-  const [formData, setFormData] = useState({
-    projectName: '',
-    address: '',
-  });
-
   const router = useRouter();
 
-  const handleChange =
-    (field: keyof typeof formData) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setFormData({
-        ...formData,
-        [field]: e.target.value,
-      });
-    };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(projectSchema),
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await projectService.create(formData);
+  const onSubmit = async (data: any) => {
+    await projectService.create(data);
     router.push(ROUTES.home);
   };
 
   return (
     <Box p={4}>
-      <form onSubmit={handleSubmit}>
-        <FormControl mb={4}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <FormControl mb={4} isInvalid={!!errors.projectName}>
           <FormLabel>Project Name</FormLabel>
-          <Input
-            value={formData.projectName}
-            onChange={handleChange('projectName')}
-          />
+          <Input {...register('projectName')} />
+          <FormErrorMessage>{errors.projectName?.message}</FormErrorMessage>
         </FormControl>
 
-        <FormControl mb={4}>
+        <FormControl mb={4} isInvalid={!!errors.address}>
           <FormLabel>Address</FormLabel>
-          <Input value={formData.address} onChange={handleChange('address')} />
+          <Input {...register('address')} />
+          <FormErrorMessage>{errors.address?.message}</FormErrorMessage>
         </FormControl>
 
         <Button type='submit'>Add Project</Button>

@@ -1,113 +1,80 @@
 'use client';
 
 import { Box, Input, Button, Textarea } from '@chakra-ui/react';
-import { FormControl, FormLabel } from '@chakra-ui/form-control';
-import { useState } from 'react';
+import {
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+} from '@chakra-ui/form-control';
 import { useRouter } from 'next/navigation';
-import { Apartment } from '@/types/types';
 import { apartmentService } from '@/services/apartmentService';
 import { ROUTES } from '@/config/routes';
 import ProjectSelect from '@/components/projects/ProjectDropdown';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { apartmentSchema } from '@/validations/validationSchemas';
 
 export default function AddApartment() {
-  const [formData, setFormData] = useState<Omit<Apartment, 'id'>>({
-    unitName: '',
-    unitNumber: '',
-    price: 0,
-    description: '',
-    sizeSQM: 0,
-    bedrooms: 0,
-    bathrooms: 0,
-    projectId: undefined,
-  });
-
   const router = useRouter();
 
-  const handleChange =
-    (field: keyof typeof formData) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setFormData({
-        ...formData,
-        [field]:
-          e.target.type === 'number'
-            ? Number(e.target.value) || 0
-            : e.target.value,
-      });
-    };
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(apartmentSchema),
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await apartmentService.create(formData);
+  const onSubmit = async (data: any) => {
+    await apartmentService.create(data);
     router.push(ROUTES.home);
-  };
-
-  const handleSelectProject = (projectId: number) => {
-    setFormData({ ...formData, projectId });
   };
 
   return (
     <Box p={4}>
-      <form onSubmit={handleSubmit}>
-        <FormControl mb={4}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <FormControl mb={4} isInvalid={!!errors.projectId}>
           <FormLabel>Project</FormLabel>
-          <ProjectSelect onSelect={handleSelectProject} />
+          <ProjectSelect
+            onSelect={(projectId) => setValue('projectId', projectId)}
+          />
+          <FormErrorMessage>{errors.projectId?.message}</FormErrorMessage>
         </FormControl>
-        <FormControl mb={4}>
+        <FormControl mb={4} isInvalid={!!errors.unitName}>
           <FormLabel>Unit Name</FormLabel>
-          <Input
-            value={formData.unitName}
-            onChange={handleChange('unitName')}
-          />
+          <Input {...register('unitName')} />
+          <FormErrorMessage>{errors.unitName?.message}</FormErrorMessage>
         </FormControl>
-        <FormControl mb={4}>
+        <FormControl mb={4} isInvalid={!!errors.unitNumber}>
           <FormLabel>Unit Number</FormLabel>
-          <Input
-            value={formData.unitNumber}
-            onChange={handleChange('unitNumber')}
-          />
+          <Input {...register('unitNumber')} />
+          <FormErrorMessage>{errors.unitNumber?.message}</FormErrorMessage>
         </FormControl>
-        <FormControl mb={4}>
+        <FormControl mb={4} isInvalid={!!errors.price}>
           <FormLabel>Price</FormLabel>
-          <Input
-            type='number'
-            min={0}
-            value={formData.price}
-            onChange={handleChange('price')}
-          />
+          <Input type='number' {...register('price')} />
+          <FormErrorMessage>{errors.price?.message}</FormErrorMessage>
         </FormControl>
-        <FormControl mb={4}>
+        <FormControl mb={4} isInvalid={!!errors.description}>
           <FormLabel>Description</FormLabel>
-          <Textarea
-            value={formData.description}
-            onChange={handleChange('description')}
-          />
+          <Textarea {...register('description')} />
+          <FormErrorMessage>{errors.description?.message}</FormErrorMessage>
         </FormControl>
-        <FormControl mb={4}>
+        <FormControl mb={4} isInvalid={!!errors.sizeSQM}>
           <FormLabel>Size (sqm)</FormLabel>
-          <Input
-            type='number'
-            min={0}
-            value={formData.sizeSQM}
-            onChange={handleChange('sizeSQM')}
-          />
+          <Input {...register('sizeSQM')} />
+          <FormErrorMessage>{errors.sizeSQM?.message}</FormErrorMessage>
         </FormControl>
-        <FormControl mb={4}>
+        <FormControl mb={4} isInvalid={!!errors.bedrooms}>
           <FormLabel>Bedrooms</FormLabel>
-          <Input
-            type='number'
-            min={0}
-            value={formData.bedrooms}
-            onChange={handleChange('bedrooms')}
-          />
+          <Input {...register('bedrooms')} />
+          <FormErrorMessage>{errors.bedrooms?.message}</FormErrorMessage>
         </FormControl>
-        <FormControl mb={4}>
+        <FormControl mb={4} isInvalid={!!errors.bathrooms}>
           <FormLabel>Bathrooms</FormLabel>
-          <Input
-            type='number'
-            min={0}
-            value={formData.bathrooms}
-            onChange={handleChange('bathrooms')}
-          />
+          <Input {...register('bathrooms')} />
+          <FormErrorMessage>{errors.bathrooms?.message}</FormErrorMessage>
         </FormControl>
         <Button type='submit'>Add Apartment</Button>
       </form>
