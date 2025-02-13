@@ -6,6 +6,8 @@ import {
   Flex,
   Spinner,
   Heading,
+  Wrap,
+  WrapItem,
 } from '@chakra-ui/react';
 import ApartmentCard from '@/components/apartments/ApartmentCard';
 import Link from 'next/link';
@@ -62,11 +64,23 @@ export default async function Home({ searchParams }: HomeProps) {
           </Button>
         </Flex>
       </form>
-      <Link href={ROUTES.addApartment}>
-        <Button colorScheme='teal' mb={4}>
-          Add Apartment
-        </Button>
-      </Link>
+      <Flex
+        mb={4}
+        gap={2}
+        flexDirection={{ base: 'column', md: 'row' }}
+        align={{ base: 'stretch', md: 'center' }}
+      >
+        <Link href={ROUTES.addApartment}>
+          <Button colorScheme='teal' w='full'>
+            Add Apartment
+          </Button>
+        </Link>
+        <Link href={ROUTES.addProject}>
+          <Button colorScheme='teal' w='full'>
+            Add Project
+          </Button>
+        </Link>
+      </Flex>
       {apartments.length === 0 ? (
         <Box>No apartments found.</Box>
       ) : (
@@ -86,19 +100,21 @@ export default async function Home({ searchParams }: HomeProps) {
 
       {/* Pagination Form */}
       {totalPages > 1 && (
-        <Flex justifyContent='center' mt={4} gap={2}>
+        <Wrap justify='center' mt={4} gap={2}>
           {Array.from({ length: totalPages }, (_, i) => (
-            <form key={i + 1} action={handlePagination}>
-              <input type='hidden' name='page' value={i + 1} />
-              <Button
-                type='submit'
-                colorScheme={i + 1 === currentPage ? 'blue' : 'gray'}
-              >
-                {i + 1}
-              </Button>
-            </form>
+            <WrapItem key={i + 1}>
+              <form action={handlePagination}>
+                <input type='hidden' name='page' value={i + 1} />
+                <Button
+                  type='submit'
+                  colorScheme={i + 1 === currentPage ? 'blue' : 'gray'}
+                >
+                  {i + 1}
+                </Button>
+              </form>
+            </WrapItem>
           ))}
-        </Flex>
+        </Wrap>
       )}
     </Box>
   );
