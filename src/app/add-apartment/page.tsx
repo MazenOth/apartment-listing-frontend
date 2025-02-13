@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Apartment } from '@/types/types';
 import { apartmentService } from '@/services/apartmentService';
 import { ROUTES } from '@/config/routes';
+import ProjectSelect from '@/components/projects/ProjectDropdown';
 
 export default function AddApartment() {
   const [formData, setFormData] = useState<Omit<Apartment, 'id'>>({
@@ -17,6 +18,7 @@ export default function AddApartment() {
     sizeSQM: 0,
     bedrooms: 0,
     bathrooms: 0,
+    projectId: undefined,
   });
 
   const router = useRouter();
@@ -39,9 +41,17 @@ export default function AddApartment() {
     router.push(ROUTES.home);
   };
 
+  const handleSelectProject = (projectId: number) => {
+    setFormData({ ...formData, projectId });
+  };
+
   return (
     <Box p={4}>
       <form onSubmit={handleSubmit}>
+        <FormControl mb={4}>
+          <FormLabel>Project</FormLabel>
+          <ProjectSelect onSelect={handleSelectProject} />
+        </FormControl>
         <FormControl mb={4}>
           <FormLabel>Unit Name</FormLabel>
           <Input
