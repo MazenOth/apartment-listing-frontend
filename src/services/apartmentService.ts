@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { Apartment } from '@/types/types';
-import { API_BASE_URL } from '@/config/api';
+import { API_BASE_URL, LOCAL_API_BASE_URL } from '@/config/api';
 
 export const apartmentService = {
   async getAll(
@@ -42,7 +42,7 @@ export const apartmentService = {
   async create(apartment: Omit<Apartment, 'id'>): Promise<Apartment> {
     try {
       const response = await axios.post<Apartment>(
-        `${API_BASE_URL}/apartments`,
+        `${LOCAL_API_BASE_URL}/apartments`,
         apartment,
         {
           headers: {
