@@ -43,7 +43,12 @@ export const apartmentService = {
     try {
       const response = await axios.post<Apartment>(
         `${API_BASE_URL}/apartments`,
-        apartment
+        apartment,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
       );
       return response.data;
     } catch (error) {

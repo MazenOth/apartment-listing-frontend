@@ -15,7 +15,12 @@ export const projectService = {
     try {
       const response = await axios.post<Project>(
         `${API_BASE_URL}/projects`,
-        project
+        project,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
       );
       return response.data;
     } catch (error) {
