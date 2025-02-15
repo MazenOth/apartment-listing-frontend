@@ -23,7 +23,15 @@ export const projectService = {
         }
       );
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.error(
+          'Error creating project:',
+          error.response?.data || error.message
+        );
+      } else {
+        console.error('Unexpected error:', error);
+      }
       throw new Error('Failed to create project. Please try again later.');
     }
   },
